@@ -1,10 +1,50 @@
 #!/bin/bash
 
-# Check if root
+### Check if root
+
 if [[ $EUID -ne 0 ]]
 then
 	echo "This script must be run as root"
 	exit 1
+
+fi
+
+### If no disk provided
+
+if [[ ! $1 ]]
+then
+	echo "Please provide a disk"
+	echo ""
+	echo "Available disks are:"
+	echo -e "$(ls /dev/sd[abcdefgh] )"
+	exit 1
+
+fi
+
+### If not a disk
+
+if [[ $1 != "$(ls $1 2> /dev/null)" && $1 =~ /dev/sd* ]]
+then
+	echo "That's not a disk... Quit that."
+	echo ""
+
+	exit 1
+
+fi
+
+### If disk is mounted
+
+if [[ $(grep $1 /proc/mounts) ]]
+then
+	echo ""
+	echo "Device is mounted"
+	echo ""
+	echo "If this is not the currently running volume (USB drive), "
+	echo "unmount the device before erasing"
+	echo ""
+
+	exit 1
+
 fi
 
 clear
@@ -18,7 +58,7 @@ echo ""
 echo "    Maximillian Schmidt"
 echo "    OSU UIT, Service Desk"
 echo ""
-echo "    Version: 1.0.0"
+echo "    Version: 1.1.0"
 echo ""
 echo "    WARNING: This script irrecoverably destroys"
 echo "             data! Please be sure you intend"
@@ -32,9 +72,11 @@ echo "################################################"
 echo ""
 echo ""
 
-echo "Script assumes /dev/sda is the SSD to be erased"
+
+echo "Script assumes $1 is the SSD to be erased"
 echo ""
 echo "Please double check by using the Gnome Disk manager"
+echo "Close the application to continue"
 printf "(Starting in 5s) "
 
 for i in `seq 1 5`
@@ -50,6 +92,23 @@ gnome-disks
 
 
 clear
+
+
+### Confirm erase
+
+echo "LAST CHANCE"
+echo ""
+
+bloweraway="t"
+
+while [[ $bloweraway != 'y' && $bloweraway != 'n' && $bloweraway != 'Y' && $bloweraway != 'N' ]]
+do
+	read -n1 -p "Erase SSD? (on touch of 'y' or 'n') " bloweraway
+	echo ""
+
+done
+
+echo ""
 
 
 ### Check if device is frozen
@@ -68,8 +127,8 @@ then
 		sleep 1
 	done
 
-	systemctl suspend 
-	
+	systemctl suspend
+
 	echo "Suspend command issued..."
 
 	sleep 10
@@ -102,23 +161,6 @@ else
 	exit 1
 
 fi
-
-
-### Confirm erase
-
-echo "LAST CHANCE"
-echo ""
-
-bloweraway="t"
-
-while [[ $bloweraway != 'y' && $bloweraway != 'n' && $bloweraway != 'Y' && $bloweraway != 'N' ]]
-do
-	read -n1 -p "Erase SSD? (on touch of 'y' or 'n') " bloweraway
-	echo ""
-
-done
-
-echo ""
 
 
 ### Do the real damage 
