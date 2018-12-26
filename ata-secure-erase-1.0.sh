@@ -4,7 +4,22 @@
 if [[ $EUID -ne 0 ]]
 then
 	echo "This script must be run as root"
+
 	exit 1
+
+fi
+
+if [[ $(grep /dev/sda /proc/mounts) ]]
+then
+	echo ""
+	echo "Device (/dev/sda) is mounted"
+	echo ""
+	echo "If this is not the currently running volume (USB drive), "
+	echo "unmount the device before erasing"
+	echo ""
+
+	exit 1
+
 fi
 
 clear
@@ -51,6 +66,31 @@ gnome-disks
 
 clear
 
+### Confirm erase
+
+echo "LAST CHANCE"
+echo ""
+
+bloweraway="t"
+
+while [[ $bloweraway != 'y' && $bloweraway != 'n' && $bloweraway != 'Y' && $bloweraway != 'N' ]]
+do
+	read -n1 -p "Erase SSD? (on touch of 'y' or 'n') " bloweraway
+	echo ""
+
+done
+
+echo ""
+
+if [[ $bloweraway == 'n' || $bloweraway == 'N' ]]
+then
+	echo "Come back when you are ready!"
+	echo ""
+
+	exit 0
+
+fi
+
 
 ### Check if device is frozen
 
@@ -72,7 +112,7 @@ then
 	
 	echo "Suspend command issued..."
 
-	sleep 10
+	sleep 7
 
 	clear
 
@@ -91,6 +131,8 @@ then
 	echo "See: https://ata.wiki.kernel.org/index.php/ATA_Secure_Erase"
 	echo "for further options to thaw the drive"
 
+	exit 1
+
 elif [[ $frozen == *"not"* ]]
 then
 	echo ""
@@ -99,26 +141,10 @@ then
 
 else
 	echo "Hull breach!"
-	exit 1
+
+	exit 2
 
 fi
-
-
-### Confirm erase
-
-echo "LAST CHANCE"
-echo ""
-
-bloweraway="t"
-
-while [[ $bloweraway != 'y' && $bloweraway != 'n' && $bloweraway != 'Y' && $bloweraway != 'N' ]]
-do
-	read -n1 -p "Erase SSD? (on touch of 'y' or 'n') " bloweraway
-	echo ""
-
-done
-
-echo ""
 
 
 ### Do the real damage 
@@ -141,6 +167,7 @@ then
 else
 	echo "Come back when you are ready!"
 	echo ""
+
 	exit 0
 
 fi
@@ -156,6 +183,7 @@ then
 	echo "Drive successfully erased!"
 	echo "Exiting..."
 	echo ""
+
 	exit 0
 
 else
@@ -163,6 +191,7 @@ else
 	echo "ERROR: Drive did not successfully erase!"	
 	echo "Please manually check on the disk or wiki"
 	echo ""
+	
 	exit 1
 
 fi

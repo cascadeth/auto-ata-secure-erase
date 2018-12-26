@@ -5,6 +5,7 @@
 if [[ $EUID -ne 0 ]]
 then
 	echo "This script must be run as root"
+
 	exit 1
 
 fi
@@ -16,7 +17,8 @@ then
 	echo "Please provide a disk"
 	echo ""
 	echo "Available disks are:"
-	echo -e "$(ls /dev/sd[abcdefgh] )"
+	echo -e "$(ls /dev/sd[a-i] )"
+
 	exit 1
 
 fi
@@ -83,6 +85,7 @@ for i in `seq 1 5`
 do
 	printf "."
 	sleep 1
+
 done
 
 echo ""
@@ -110,6 +113,14 @@ done
 
 echo ""
 
+if [[ $bloweraway == 'n' || $bloweraway == 'N' ]]
+then
+	echo "Come back when you are ready!"
+	echo ""
+
+	exit 0
+
+fi
 
 ### Check if device is frozen
 
@@ -125,17 +136,19 @@ then
 	do
 		printf "."
 		sleep 1
+
 	done
 
 	systemctl suspend
 
 	echo "Suspend command issued..."
 
-	sleep 10
+	sleep 7
 
 	clear
 
 	echo "Man that was a short nap..."
+
 fi
 
 
@@ -158,6 +171,7 @@ then
 
 else
 	echo "Hull breach!"
+
 	exit 1
 
 fi
@@ -180,11 +194,6 @@ then
 	time hdparm --user-master u --security-erase Blue32 /dev/sda
 	echo ""
 
-else
-	echo "Come back when you are ready!"
-	echo ""
-	exit 0
-
 fi
 
 
@@ -198,6 +207,7 @@ then
 	echo "Drive successfully erased!"
 	echo "Exiting..."
 	echo ""
+
 	exit 0
 
 else
@@ -205,6 +215,7 @@ else
 	echo "ERROR: Drive did not successfully erase!"	
 	echo "Please manually check on the disk or wiki"
 	echo ""
+
 	exit 1
 
 fi
