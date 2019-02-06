@@ -17,7 +17,9 @@ then
 	echo "Please provide a disk"
 	echo ""
 	echo "Available disks are:"
-	echo -e "$(ls /dev/sd[a-i] )"
+	echo -e "$(ls /dev/sd[a-k] )"
+	echo ""
+	echo "Example: sudo ./ata-secure-erase-1.1.sh /dev/sda"
 
 	exit 1
 
