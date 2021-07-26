@@ -164,6 +164,8 @@ then
 	echo ""
 	echo "See: https://ata.wiki.kernel.org/index.php/ATA_Secure_Erase"
 	echo "for further options to thaw the drive"
+	
+	exit 1
 
 elif [[ $frozen == *"not"* ]]
 then
