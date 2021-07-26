@@ -126,11 +126,11 @@ fi
 
 ### Check if device is frozen
 
-frozen="$(hdparm -I /dev/sda | grep 'frozen')"
+frozen="$(hdparm -I $1 | grep 'frozen')"
 
 if [[ $frozen != *"not"* ]]
 then
-	echo "/dev/sda is frozen!"
+	echo "$1 is frozen!"
 	echo ""
 	printf "Trying suspend in 3s "
 
@@ -156,11 +156,11 @@ fi
 
 ### Check if still frozen
 
-frozen="$(hdparm -I /dev/sda | grep 'frozen')"
+frozen="$(hdparm -I $1 | grep 'frozen')"
 
 if [[ $frozen != *"not"* ]]
 then
-	echo "ERROR:  /dev/sda is still frozen!"
+	echo "ERROR:  $1 is still frozen!"
 	echo ""
 	echo "See: https://ata.wiki.kernel.org/index.php/ATA_Secure_Erase"
 	echo "for further options to thaw the drive"
@@ -168,7 +168,7 @@ then
 elif [[ $frozen == *"not"* ]]
 then
 	echo ""
-	echo "/dev/sda thawed"
+	echo "$1 thawed"
 	echo ""
 
 else
@@ -188,12 +188,12 @@ then
 
 	# Set password
 	echo "Setting user password..."
-	hdparm --user-master u --security-set-pass Blue32 /dev/sda
+	hdparm --user-master u --security-set-pass Blue32 $1
 	echo ""
 
 	# Issue ATA Secure Erase command
 	echo "Issuing ATA Secure Erase command..."
-	time hdparm --user-master u --security-erase Blue32 /dev/sda
+	time hdparm --user-master u --security-erase Blue32 $1
 	echo ""
 
 fi
@@ -201,7 +201,7 @@ fi
 
 ### Verify security removed, indicating drive is wiped
 
-wiped="$(hdparm -I /dev/sda | grep 'enabled')"
+wiped="$(hdparm -I $1 | grep 'enabled')"
 
 if [[ $wiped == *"not"* ]]
 then
